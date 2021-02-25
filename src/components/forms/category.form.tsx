@@ -4,28 +4,29 @@ import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import formStyles from "./form.styles";
 import {useFormik} from "formik";
-import authorValidationSchema from "./author.validation.schema";
-import {AuthorFormInterface} from "../../interfaces/models.interfaces";
+import categoryValidationSchema from "./category.validation.schema";
+
+import {CategoryFormInterface} from "../../interfaces/models.interfaces";
 import {GlobalContext} from "../../context/global.state";
-import { AuthorFormPropsInterface } from "./form.interfaces";
+import {CategoryFormPropsInterface} from "./form.interfaces";
 
-const AuthorForm = (props: AuthorFormPropsInterface) => {
+const CategoryForm = (props: CategoryFormPropsInterface) => {
+    const {categories, addCategory, editCategory} = useContext(GlobalContext);
     const classes = formStyles();
-    const {authors, addAuthor, editAuthor} = useContext(GlobalContext);
 
-    const formik = useFormik<AuthorFormInterface>({
+    const formik = useFormik<CategoryFormInterface>({
         initialValues: {
-            firstName: props.initialValues?.firstName || "",
-            lastName: props.initialValues?.lastName || "",
+            name: props.initialValues?.name || "",
+            description: props.initialValues?.description || "",
         },
-        validationSchema: authorValidationSchema,
-        onSubmit: (values: AuthorFormInterface) => {
-            const {firstName, lastName} = values;
+        validationSchema: categoryValidationSchema,
+        onSubmit: (values: CategoryFormInterface) => {
+            const {name, description} = values;
             // TODO remove hack for work without ajax calls
             if (props.initialValues) {
-                editAuthor({id: props.initialValues.id, firstName, lastName});
+                editCategory({id: props.initialValues.id, name, description});
             } else {
-                addAuthor({id: (authors.length + 1), firstName, lastName});
+                addCategory({id: (categories.length + 1), name, description});
             }
 
             props.closeModalCallback();
@@ -33,25 +34,25 @@ const AuthorForm = (props: AuthorFormPropsInterface) => {
     });
 
     return (<>
-            <h1>Author</h1>
+            <h1>Category</h1>
             <form onSubmit={formik.handleSubmit} className={classes.form}>
                 <Grid container spacing={2}>
                     <Grid item xs={12} sm={6}>
                         <TextField
-                            autoComplete="fname"
-                            name="firstName"
+                            autoComplete="name"
+                            name="name"
                             variant="outlined"
                             required
                             fullWidth
-                            id="firstName"
-                            label="First Name"
+                            id="name"
+                            label="Name"
                             autoFocus
 
                             onChange={formik.handleChange}
-                            value={formik.values.firstName}
+                            value={formik.values.name}
 
-                            error={formik.touched.firstName && Boolean(formik.errors.firstName)}
-                            helperText={formik.touched.firstName && formik.errors.firstName}
+                            error={formik.touched.name && Boolean(formik.errors.name)}
+                            helperText={formik.touched.name && formik.errors.name}
                         />
                     </Grid>
                     <Grid item xs={12} sm={6}>
@@ -59,16 +60,16 @@ const AuthorForm = (props: AuthorFormPropsInterface) => {
                             variant="outlined"
                             required
                             fullWidth
-                            id="lastName"
-                            label="Last Name"
-                            name="lastName"
-                            autoComplete="lname"
+                            id="description"
+                            label="Description"
+                            name="description"
+                            autoComplete="description"
 
                             onChange={formik.handleChange}
-                            value={formik.values.lastName}
+                            value={formik.values.description}
 
-                            error={formik.touched.lastName && Boolean(formik.errors.lastName)}
-                            helperText={formik.touched.lastName && formik.errors.lastName}
+                            error={formik.touched.description && Boolean(formik.errors.description)}
+                            helperText={formik.touched.description && formik.errors.description}
                         />
                     </Grid>
                 </Grid>
@@ -87,4 +88,4 @@ const AuthorForm = (props: AuthorFormPropsInterface) => {
     );
 };
 
-export default AuthorForm;
+export default CategoryForm;

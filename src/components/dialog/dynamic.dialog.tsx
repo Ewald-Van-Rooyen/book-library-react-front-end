@@ -7,6 +7,8 @@ import {GlobalContext} from "../../context/global.state";
 import {MODELS} from "../../utils/constants";
 import AuthorForm from "../forms/author.form";
 import {AuthorInterface, BookInterface, CategoryInterface, DialogTypeEnum} from "../../interfaces/models.interfaces";
+import CategoryForm from "../forms/category.form";
+import BooksForm from "../forms/books.form";
 
 interface DynamicDialogPropsInterface {
     isOpen: boolean;
@@ -18,12 +20,16 @@ const generateModelForm = (activeModel: MODELS, closeModalCallback: () => void, 
 
     switch (activeModel) {
         case MODELS.AUTHOR:
-            return <AuthorForm initialValues={actionType === DialogTypeEnum.EDIT ? selectedRow as AuthorInterface : null}
-                               closeModalCallback={closeModalCallback}/>;
+            return <AuthorForm
+                initialValues={actionType === DialogTypeEnum.EDIT ? selectedRow as AuthorInterface : null}
+                closeModalCallback={closeModalCallback}/>;
         case MODELS.BOOK:
-            return null;
+            return <BooksForm initialValues={actionType === DialogTypeEnum.EDIT ? selectedRow as BookInterface : null}
+              closeModalCallback={closeModalCallback} />;
         case MODELS.CATEGORY:
-            return null;
+            return <CategoryForm
+                initialValues={actionType === DialogTypeEnum.EDIT ? selectedRow as CategoryInterface : null}
+                closeModalCallback={closeModalCallback}/>;
         default:
             return null;
     }

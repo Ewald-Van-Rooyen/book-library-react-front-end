@@ -72,7 +72,7 @@ const AppReducer = (state: GlobalContextInterface, action: any) => {
                 authors: updatedAuthors
             };
 
-        case "EDIT_BOOKS":
+        case "EDIT_BOOK":
             const updatedBook = action.payload;
 
             const updatedBooks = state.books.map((book: BookInterface) => {

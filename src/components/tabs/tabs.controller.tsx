@@ -14,10 +14,11 @@ import {GlobalContext} from "../../context/global.state";
 const tabUtils = new TabUtils();
 
 const TabsController = () => {
-    const {activeModel, setActiveModel} = useContext(GlobalContext);
+    const {activeModel, setActiveModel, setSelectedRow} = useContext(GlobalContext);
 
     const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
         setActiveModel(newValue);
+        setSelectedRow(null);
     };
 
     return (<>

@@ -47,7 +47,7 @@ export const GlobalProvider = ({children}) => {
 
     const addBook = (book: BookInterface) => {
         dispatch({
-            type: "ADD_CATEGORY",
+            type: "ADD_BOOK",
             payload: book
         });
     };

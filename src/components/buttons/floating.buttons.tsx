@@ -32,19 +32,21 @@ const FloatingButtons = () => {
     };
 
     const deleteContent = (): void => {
-        // call delete api here
-        switch (activeModel) {
-            case MODELS.AUTHOR:
-                removeAuthor((selectedRow as AuthorInterface).id);
-                break;
-            case MODELS.BOOK:
-                removeBook((selectedRow as BookInterface).id);
-                break;
-            case MODELS.CATEGORY:
-                removeCategory((selectedRow as CategoryInterface).id);
-                break;
-            default:
-                break;
+        if (selectedRow) {
+            // call delete api here
+            switch (activeModel) {
+                case MODELS.AUTHOR:
+                    removeAuthor((selectedRow as AuthorInterface).id);
+                    break;
+                case MODELS.BOOK:
+                    removeBook((selectedRow as BookInterface).id);
+                    break;
+                case MODELS.CATEGORY:
+                    removeCategory((selectedRow as CategoryInterface).id);
+                    break;
+                default:
+                    break;
+            }
         }
     };
 
