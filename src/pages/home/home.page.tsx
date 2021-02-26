@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from "react";
+import React, {useContext} from "react";
 import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
 import {useQuery} from "react-query";
@@ -19,7 +19,7 @@ const HomePage = () => {
 
     useQuery("fetchAuthors", async () => {
         const {data} = await axios.get(URLS.AUTHOR);
-        addAuthorsBulk(data.authors as Array<AuthorInterface>);
+        addAuthorsBulk(data as Array<AuthorInterface>);
     });
 
     return (
