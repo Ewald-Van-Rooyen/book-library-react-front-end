@@ -5,10 +5,18 @@ import Fab from "@material-ui/core/Fab";
 import AddIcon from "@material-ui/icons/Add";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
-import {MODELS} from "../../utils/constants";
+import {MODELS, URLS} from "../../utils/constants";
 import {GlobalContext} from "../../context/global.state";
-import {AuthorInterface, BookInterface, CategoryInterface, DialogTypeEnum} from "../../interfaces/models.interfaces";
+import {
+    AuthorFormInterface,
+    AuthorInterface,
+    BookInterface,
+    CategoryInterface,
+    DialogTypeEnum
+} from "../../interfaces/models.interfaces";
 import DynamicDialog from "../dialog/dynamic.dialog";
+import {useMutation} from "react-query";
+import axios from "axios";
 
 
 const FloatingButtons = () => {
@@ -16,6 +24,15 @@ const FloatingButtons = () => {
     const {selectedRow, activeModel, removeAuthor, removeCategory, removeBook} = useContext(GlobalContext);
     const [isOpen, setIsOpen] = useState(false);
     const [dialogAction, setDialogAction] = useState(DialogTypeEnum.ADD);
+
+    const mutation = useMutation(async (id: string | number) => {
+        const {data} = await axios.delete(`${URLS.AUTHOR}/${id}`);
+        return data;
+    }, {
+        onSuccess: () => {
+            removeAuthor((selectedRow as AuthorInterface).id);
+        }
+    });
 
     const closeCallback = () => {
         setIsOpen(false);
@@ -36,7 +53,7 @@ const FloatingButtons = () => {
             // call delete api here
             switch (activeModel) {
                 case MODELS.AUTHOR:
-                    removeAuthor((selectedRow as AuthorInterface).id);
+                    mutation.mutate((selectedRow as AuthorInterface).id);
                     break;
                 case MODELS.BOOK:
                     removeBook((selectedRow as BookInterface).id);

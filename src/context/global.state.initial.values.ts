@@ -1,10 +1,10 @@
 import GlobalContextInterface from "./global.state.interface";
-import {AUTHOR_ROWS, BOOK_ROWS, CATEGORY_ROWS} from "../utils/setup/table.test.data";
+import { BOOK_ROWS, CATEGORY_ROWS} from "../utils/setup/table.test.data";
 import {MODELS} from "../utils/constants";
 
 const contextDefaultValues: GlobalContextInterface = {
     categories: CATEGORY_ROWS,
-    authors: AUTHOR_ROWS,
+    authors: [],
     books: BOOK_ROWS,
 
     selectedRow: null,
@@ -23,6 +23,9 @@ const contextDefaultValues: GlobalContextInterface = {
     },
 
     addAuthor: () => {
+    },
+
+    addAuthorsBulk: () => {
     },
 
     addBook: () => {

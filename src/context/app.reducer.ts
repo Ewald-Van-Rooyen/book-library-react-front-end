@@ -38,6 +38,11 @@ const AppReducer = (state: GlobalContextInterface, action: any) => {
                 ...state,
                 authors: [...state.authors, action.payload]
             };
+        case "ADD_AUTHORS_BULK":
+            return {
+                ...state,
+                authors: [...action.payload]
+            };
         case "ADD_BOOK":
             return {
                 ...state,

@@ -40,8 +40,15 @@ export const GlobalProvider = ({children}) => {
 
     const addAuthor = (author: AuthorInterface) => {
         dispatch({
-            type: 'ADD_AUTHOR',
+            type: "ADD_AUTHOR",
             payload: author
+        });
+    };
+
+    const addAuthorsBulk = (authors: Array<AuthorInterface>) => {
+        dispatch({
+            type: "ADD_AUTHORS_BULK",
+            payload: authors
         });
     };
 
@@ -101,6 +108,7 @@ export const GlobalProvider = ({children}) => {
 
         addCategory,
         addAuthor,
+        addAuthorsBulk,
         addBook,
 
         editCategory,

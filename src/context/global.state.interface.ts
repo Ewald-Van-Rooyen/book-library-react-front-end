@@ -9,25 +9,27 @@ export default interface GlobalContextInterface {
     selectedRow: CategoryInterface | AuthorInterface | BookInterface | null;
     activeModel: MODELS;
 
-    removeCategory(id: string | number): any;
+    removeCategory(id: string | number): void;
 
-    removeAuthor(id: string | number): any;
+    removeAuthor(id: string | number): void;
 
-    removeBook(id: string | number): any;
+    removeBook(id: string | number): void;
 
-    addCategory(category: CategoryInterface): any;
+    addCategory(category: CategoryInterface): void;
 
-    addAuthor(author: AuthorInterface): any;
+    addAuthor(author: AuthorInterface): void;
 
-    addBook(book: BookInterface): any;
+    addAuthorsBulk(authors: Array<AuthorInterface>):void;
 
-    editCategory(category: CategoryInterface): any;
+    addBook(book: BookInterface): void;
 
-    editAuthor(author: AuthorInterface): any;
+    editCategory(category: CategoryInterface): void;
 
-    editBook(books: BookInterface): any;
+    editAuthor(author: AuthorInterface): void;
 
-    setSelectedRow(selectedRow: CategoryInterface | AuthorInterface | BookInterface | null): any;
+    editBook(books: BookInterface): void;
 
-    setActiveModel(activeModel: MODELS): any;
+    setSelectedRow(selectedRow: CategoryInterface | AuthorInterface | BookInterface | null): void;
+
+    setActiveModel(activeModel: MODELS): void;
 }

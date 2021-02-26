@@ -5,13 +5,40 @@ import Button from "@material-ui/core/Button";
 import formStyles from "./form.styles";
 import {useFormik} from "formik";
 import authorValidationSchema from "./author.validation.schema";
-import {AuthorFormInterface} from "../../interfaces/models.interfaces";
+import {AuthorFormInterface, AuthorInterface} from "../../interfaces/models.interfaces";
 import {GlobalContext} from "../../context/global.state";
-import { AuthorFormPropsInterface } from "./form.interfaces";
+import {AuthorFormPropsInterface} from "./form.interfaces";
+import axios from "axios";
+import {URLS} from "../../utils/constants";
+import {useMutation} from "react-query";
 
 const AuthorForm = (props: AuthorFormPropsInterface) => {
     const classes = formStyles();
-    const {authors, addAuthor, editAuthor} = useContext(GlobalContext);
+    const {addAuthor, editAuthor} = useContext(GlobalContext);
+
+    const mutation = useMutation(async (author: AuthorInterface | AuthorFormInterface) => {
+        const id = (author as AuthorInterface).id || null;
+
+        if (id) {
+            const {data} = await axios.put(`${URLS.AUTHOR}/${(author as AuthorInterface).id}`, author);
+            return data;
+        } else {
+            const {data} = await axios.post(URLS.AUTHOR, author);
+            return data;
+        }
+    }, {
+        onSuccess: (data: AuthorInterface) => {
+            const createdAuthor = {id: data.id, firstName: data.firstName, lastName: data.lastName};
+
+            if (props.initialValues) {
+                editAuthor(createdAuthor);
+            } else {
+                addAuthor(createdAuthor);
+            }
+
+            props.closeModalCallback();
+        }
+    });
 
     const formik = useFormik<AuthorFormInterface>({
         initialValues: {
@@ -22,13 +49,14 @@ const AuthorForm = (props: AuthorFormPropsInterface) => {
         onSubmit: (values: AuthorFormInterface) => {
             const {firstName, lastName} = values;
             // TODO remove hack for work without ajax calls
+            const authorSaveObject = {firstName, lastName};
+
             if (props.initialValues) {
-                editAuthor({id: props.initialValues.id, firstName, lastName});
-            } else {
-                addAuthor({id: (authors.length + 1), firstName, lastName});
+                // @ts-ignore
+                authorSaveObject.id = props.initialValues.id;
             }
 
-            props.closeModalCallback();
+            mutation.mutate(authorSaveObject);
         },
     });
 
