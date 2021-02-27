@@ -9,17 +9,25 @@ import homePageStyles from "./home.page.styles";
 import FloatingButtons from "../../components/buttons/floating.buttons";
 
 import axios from "axios";
-import {AuthorInterface} from "../../interfaces/models.interfaces";
+import {AuthorInterface, CategoryInterface} from "../../interfaces/models.interfaces";
 import {URLS} from "../../utils/constants";
 import {GlobalContext} from "../../context/global.state";
+import ValidationUtils from "../../utils/ValidationUtils";
 
 const HomePage = () => {
-    const {addAuthorsBulk} = useContext(GlobalContext);
+    const {addAuthorsBulk, addCategoriesBulk, token} = useContext(GlobalContext);
     const classes = homePageStyles();
 
     useQuery("fetchAuthors", async () => {
-        const {data} = await axios.get(URLS.AUTHOR);
-        addAuthorsBulk(data as Array<AuthorInterface>);
+        axios.get(URLS.AUTHOR, ValidationUtils.generateAuthHeaders(token)).then((response) => {
+            addAuthorsBulk(response.data as Array<AuthorInterface>)
+        });
+    });
+
+    useQuery("fetchCategory", () => {
+        axios.get(URLS.CATEGORY,ValidationUtils.generateAuthHeaders(token)).then((response) => {
+            addCategoriesBulk(response.data as Array<CategoryInterface>);
+        });
     });
 
     return (

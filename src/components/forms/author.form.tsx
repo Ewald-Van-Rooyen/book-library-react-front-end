@@ -11,19 +11,20 @@ import {AuthorFormPropsInterface} from "./form.interfaces";
 import axios from "axios";
 import {URLS} from "../../utils/constants";
 import {useMutation} from "react-query";
+import ValidationUtils from "../../utils/ValidationUtils";
 
 const AuthorForm = (props: AuthorFormPropsInterface) => {
     const classes = formStyles();
-    const {addAuthor, editAuthor} = useContext(GlobalContext);
+    const {addAuthor, editAuthor, token} = useContext(GlobalContext);
 
     const mutation = useMutation(async (author: AuthorInterface | AuthorFormInterface) => {
         const id = (author as AuthorInterface).id || null;
 
         if (id) {
-            const {data} = await axios.put(`${URLS.AUTHOR}/${(author as AuthorInterface).id}`, author);
+            const {data} = await axios.put(`${URLS.AUTHOR}/${(author as AuthorInterface).id}`, author, ValidationUtils.generateAuthHeaders(token));
             return data;
         } else {
-            const {data} = await axios.post(URLS.AUTHOR, author);
+            const {data} = await axios.post(URLS.AUTHOR, author, ValidationUtils.generateAuthHeaders(token));
             return data;
         }
     }, {
@@ -48,7 +49,6 @@ const AuthorForm = (props: AuthorFormPropsInterface) => {
         validationSchema: authorValidationSchema,
         onSubmit: (values: AuthorFormInterface) => {
             const {firstName, lastName} = values;
-            // TODO remove hack for work without ajax calls
             const authorSaveObject = {firstName, lastName};
 
             if (props.initialValues) {

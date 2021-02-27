@@ -16,6 +16,23 @@ export interface BookFormInterface {
     isbnNumber: string;
 }
 
+export interface SignupInterface {
+    fullName: string;
+    username: string;
+    password: string;
+    email: string;
+}
+
+export interface SigninInterface {
+    username: string;
+    password: string;
+}
+
+export interface AuthenticationInterface {
+    authorized: boolean;
+    token: string;
+}
+
 export interface AuthorInterface extends AuthorFormInterface {
     id: number;
 }

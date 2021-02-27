@@ -52,6 +52,13 @@ export const GlobalProvider = ({children}) => {
         });
     };
 
+    const addCategoriesBulk = (categories: Array<CategoryInterface>) => {
+        dispatch({
+            type: "ADD_CATEGORIES_BULK",
+            payload: categories
+        });
+    };
+
     const addBook = (book: BookInterface) => {
         dispatch({
             type: "ADD_BOOK",
@@ -70,6 +77,13 @@ export const GlobalProvider = ({children}) => {
         dispatch({
             type: 'SET_ACTIVE_MODEL',
             payload: activeModel
+        });
+    };
+
+    const setToken = (token: string) => {
+        dispatch({
+            type: "SET_TOKEN",
+            payload: token
         });
     };
 
@@ -101,12 +115,14 @@ export const GlobalProvider = ({children}) => {
 
         selectedRow: state.selectedRow,
         activeModel: state.activeModel,
+        token: state.token,
 
         removeCategory,
         removeAuthor,
         removeBook,
 
         addCategory,
+        addCategoriesBulk,
         addAuthor,
         addAuthorsBulk,
         addBook,
@@ -116,7 +132,8 @@ export const GlobalProvider = ({children}) => {
         editBook,
 
         setSelectedRow,
-        setActiveModel
+        setActiveModel,
+        setToken
     }}>
         {children}
     </GlobalContext.Provider>);

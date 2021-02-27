@@ -6,13 +6,45 @@ import formStyles from "./form.styles";
 import {useFormik} from "formik";
 import categoryValidationSchema from "./category.validation.schema";
 
-import {CategoryFormInterface} from "../../interfaces/models.interfaces";
+import {
+    CategoryFormInterface,
+    CategoryInterface
+} from "../../interfaces/models.interfaces";
 import {GlobalContext} from "../../context/global.state";
 import {CategoryFormPropsInterface} from "./form.interfaces";
+import {useMutation} from "react-query";
+import axios from "axios";
+import {URLS} from "../../utils/constants";
+import ValidationUtils from "../../utils/ValidationUtils";
 
 const CategoryForm = (props: CategoryFormPropsInterface) => {
-    const {categories, addCategory, editCategory} = useContext(GlobalContext);
+    const {addCategory, editCategory, token} = useContext(GlobalContext);
     const classes = formStyles();
+
+    const mutation = useMutation(async (category: CategoryInterface | CategoryFormInterface) => {
+        const id = (category as CategoryInterface).id || null;
+
+        if (id) {
+            const {data} = await axios.put(`${URLS.CATEGORY}/${(category as CategoryInterface).id}`, category, ValidationUtils.generateAuthHeaders(token));
+            return data;
+        } else {
+            const {data} = await axios.post(URLS.CATEGORY, category, ValidationUtils.generateAuthHeaders(token));
+            return data;
+        }
+    }, {
+        onSuccess: (data: CategoryInterface) => {
+            const createdCategory = {id: data.id, name: data.name, description: data.description};
+
+            if (props.initialValues) {
+                editCategory(createdCategory);
+                
+            } else {
+                addCategory(createdCategory);
+            }
+
+            props.closeModalCallback();
+        }
+    });
 
     const formik = useFormik<CategoryFormInterface>({
         initialValues: {
@@ -22,14 +54,14 @@ const CategoryForm = (props: CategoryFormPropsInterface) => {
         validationSchema: categoryValidationSchema,
         onSubmit: (values: CategoryFormInterface) => {
             const {name, description} = values;
-            // TODO remove hack for work without ajax calls
+            const categorySaveObject = {name, description};
+
             if (props.initialValues) {
-                editCategory({id: props.initialValues.id, name, description});
-            } else {
-                addCategory({id: (categories.length + 1), name, description});
+                // @ts-ignore
+                categorySaveObject.id = props.initialValues.id;
             }
 
-            props.closeModalCallback();
+            mutation.mutate(categorySaveObject);
         },
     });
 

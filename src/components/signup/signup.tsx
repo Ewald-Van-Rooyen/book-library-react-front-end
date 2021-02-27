@@ -1,5 +1,4 @@
-import React from "react";
-import Avatar from "@material-ui/core/Avatar";
+import React, {useContext} from "react";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
@@ -7,14 +6,20 @@ import TextField from "@material-ui/core/TextField";
 import Link from "@material-ui/core/Link";
 import Grid from "@material-ui/core/Grid";
 
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import Container from "@material-ui/core/Container";
 
 import signUpStyles from "./signup.styles";
 import {useFormik} from "formik";
 import signupValidationSchema from "./signup.validation.schema";
-import {SignupValuesInterfaces} from "./signup.interfaces";
+import {useMutation} from "react-query";
+import {
+    AuthenticationInterface,
+    SignupInterface,
+} from "../../interfaces/models.interfaces";
+import axios from "axios";
+import {URLS} from "../../utils/constants";
+import {GlobalContext} from "../../context/global.state";
 
 interface SignupPropsInterface {
     anchorClickCallback: () => void;
@@ -22,19 +27,29 @@ interface SignupPropsInterface {
 }
 
 const Signup = (props: SignupPropsInterface) => {
+    const {setToken} = useContext(GlobalContext);
     const classes = signUpStyles();
 
-    const formik = useFormik<SignupValuesInterfaces>({
+    const mutation = useMutation(async (user: SignupInterface) => {
+        const {data} = await axios.post(`${URLS.BASE_URL}signup`, user);
+        return data;
+    }, {
+        onSuccess: (data: AuthenticationInterface) => {
+            setToken(data.token);
+            props.submitClickCallback();
+        }
+    });
+
+    const formik = useFormik<SignupInterface>({
         initialValues: {
-            firstName: "",
-            lastName: "",
-            userName: "",
+            fullName: "",
+            username: "",
             email: "",
             password: ""
         },
         validationSchema: signupValidationSchema,
-        onSubmit: values => {
-            props.submitClickCallback();
+        onSubmit: (values: SignupInterface) => {
+            mutation.mutate(values);
         },
     });
 
@@ -42,49 +57,52 @@ const Signup = (props: SignupPropsInterface) => {
         <Container component="main" maxWidth="xs">
             <CssBaseline/>
             <div className={classes.paper}>
-                <Avatar className={classes.avatar}>
-                    <LockOutlinedIcon/>
-                </Avatar>
+                {/*Move to own component*/}
+                <Typography component="h1" variant="h3">
+                    Book Library
+                </Typography>
                 <Typography component="h1" variant="h5">
                     Sign up
                 </Typography>
-                <form className={classes.form}>
+                <form onSubmit={formik.handleSubmit} className={classes.form}>
                     <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
+                        <Grid item xs={12}>
                             <TextField
-                                autoComplete="fname"
-                                name="firstName"
+                                autoComplete="fullName"
+                                name="fullName"
                                 variant="outlined"
                                 required
                                 fullWidth
-                                id="firstName"
-                                label="First Name"
+                                id="fullName"
+                                label="Full Name"
                                 autoFocus
 
                                 onChange={formik.handleChange}
-                                value={formik.values.firstName}
+                                value={formik.values.fullName}
 
-                                error={formik.touched.firstName && Boolean(formik.errors.firstName)}
-                                helperText={formik.touched.firstName && formik.errors.firstName}
+                                error={formik.touched.fullName && Boolean(formik.errors.fullName)}
+                                helperText={formik.touched.fullName && formik.errors.fullName}
                             />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid item xs={12}>
                             <TextField
+                                autoComplete="username"
+                                name="username"
                                 variant="outlined"
                                 required
                                 fullWidth
-                                id="lastName"
-                                label="Last Name"
-                                name="lastName"
-                                autoComplete="lname"
+                                id="username"
+                                label="Username"
+                                autoFocus
 
                                 onChange={formik.handleChange}
-                                value={formik.values.lastName}
+                                value={formik.values.username}
 
-                                error={formik.touched.lastName && Boolean(formik.errors.lastName)}
-                                helperText={formik.touched.lastName && formik.errors.lastName}
+                                error={formik.touched.username && Boolean(formik.errors.username)}
+                                helperText={formik.touched.username && formik.errors.username}
                             />
                         </Grid>
+
                         <Grid item xs={12}>
                             <TextField
                                 variant="outlined"

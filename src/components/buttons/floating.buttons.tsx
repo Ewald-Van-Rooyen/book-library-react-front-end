@@ -8,7 +8,6 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import {MODELS, URLS} from "../../utils/constants";
 import {GlobalContext} from "../../context/global.state";
 import {
-    AuthorFormInterface,
     AuthorInterface,
     BookInterface,
     CategoryInterface,
@@ -17,20 +16,51 @@ import {
 import DynamicDialog from "../dialog/dynamic.dialog";
 import {useMutation} from "react-query";
 import axios from "axios";
+import ValidationUtils from "../../utils/ValidationUtils";
 
 
 const FloatingButtons = () => {
 
-    const {selectedRow, activeModel, removeAuthor, removeCategory, removeBook} = useContext(GlobalContext);
+    const {selectedRow, activeModel, removeAuthor, removeCategory, removeBook, token} = useContext(GlobalContext);
     const [isOpen, setIsOpen] = useState(false);
     const [dialogAction, setDialogAction] = useState(DialogTypeEnum.ADD);
 
     const mutation = useMutation(async (id: string | number) => {
-        const {data} = await axios.delete(`${URLS.AUTHOR}/${id}`);
+        let activeModelUrl = "";
+        // TODO move to method
+        switch (activeModel) {
+            case MODELS.AUTHOR:
+                activeModelUrl = URLS.AUTHOR;
+                break;
+            case MODELS.BOOK:
+                activeModelUrl = URLS.BOOK;
+                break;
+            case MODELS.CATEGORY:
+                activeModelUrl = URLS.CATEGORY;
+                break;
+            default:
+                activeModelUrl = "";
+                break;
+        }
+
+        const {data} = await axios.delete(`${activeModelUrl}/${id}`, ValidationUtils.generateAuthHeaders(token));
         return data;
     }, {
         onSuccess: () => {
             removeAuthor((selectedRow as AuthorInterface).id);
+            switch (activeModel) {
+                case MODELS.AUTHOR:
+                    removeAuthor((selectedRow as AuthorInterface).id);
+                    break;
+                case MODELS.BOOK:
+                    removeBook((selectedRow as BookInterface).id);
+                    break;
+                case MODELS.CATEGORY:
+                    removeCategory((selectedRow as CategoryInterface).id);
+                    break;
+                default:
+                    break;
+            }
         }
     });
 
@@ -56,10 +86,10 @@ const FloatingButtons = () => {
                     mutation.mutate((selectedRow as AuthorInterface).id);
                     break;
                 case MODELS.BOOK:
-                    removeBook((selectedRow as BookInterface).id);
+                    mutation.mutate((selectedRow as BookInterface).id);
                     break;
                 case MODELS.CATEGORY:
-                    removeCategory((selectedRow as CategoryInterface).id);
+                    mutation.mutate((selectedRow as CategoryInterface).id);
                     break;
                 default:
                     break;

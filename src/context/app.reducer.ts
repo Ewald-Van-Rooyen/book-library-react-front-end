@@ -3,6 +3,11 @@ import GlobalContextInterface from "./global.state.interface";
 
 const AppReducer = (state: GlobalContextInterface, action: any) => {
     switch (action.type) {
+        case "SET_TOKEN":
+            return {
+                ...state,
+                token: action.payload
+            };
         case "SET_SELECTED_ROW":
             return {
                 ...state,
@@ -42,6 +47,11 @@ const AppReducer = (state: GlobalContextInterface, action: any) => {
             return {
                 ...state,
                 authors: [...action.payload]
+            };
+        case "ADD_CATEGORIES_BULK":
+            return {
+                ...state,
+                categories: [...action.payload]
             };
         case "ADD_BOOK":
             return {

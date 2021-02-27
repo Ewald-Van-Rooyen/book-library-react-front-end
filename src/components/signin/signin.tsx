@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useContext, useState} from "react";
 
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -14,25 +14,47 @@ import loginStyles from "./signin.styles";
 import loginValidationSchema from "./signin.validation.schema";
 
 import {useFormik} from "formik";
-import {LoginValuesInterfaces} from "./signin.interfaces";
+import {useMutation} from "react-query";
+import {AuthenticationInterface, SigninInterface} from "../../interfaces/models.interfaces";
+import axios from "axios";
+import {URLS} from "../../utils/constants";
+import {GlobalContext} from "../../context/global.state";
+import ErrorMessage from "../ui/error.message";
+
 
 interface LoginPropsInterface {
     anchorClickCallback: () => void;
     submitClickCallback: () => void;
 }
 
-
 const Signin = (props: LoginPropsInterface) => {
     const classes = loginStyles();
 
-    const formik = useFormik<LoginValuesInterfaces>({
+    const [showErrorMessage, setShowErrorMessage] = useState(false);
+    const {setToken} = useContext(GlobalContext);
+
+    const mutation = useMutation(async (user: SigninInterface) => {
+        const {data} = await axios.post(`${URLS.BASE_URL}signin`, user);
+        return data;
+    }, {
+        onSuccess: (data: AuthenticationInterface) => {
+            setToken(data.token);
+            props.submitClickCallback();
+        },
+        onError: (error) => {
+            console.log(error);
+            setShowErrorMessage(true);
+        }
+    });
+
+    const formik = useFormik<SigninInterface>({
         initialValues: {
-            email: "",
+            username: "",
             password: ""
         },
         validationSchema: loginValidationSchema,
-        onSubmit: values => {
-            props.submitClickCallback();
+        onSubmit: (values: SigninInterface) => {
+            mutation.mutate(values);
         },
     });
 
@@ -52,17 +74,17 @@ const Signin = (props: LoginPropsInterface) => {
                         margin="normal"
                         required
                         fullWidth
-                        id="email"
-                        label="Email Address"
-                        name="email"
-                        autoComplete="email"
+                        id="username"
+                        label="Username"
+                        name="username"
+                        autoComplete="username"
                         autoFocus
 
                         onChange={formik.handleChange}
-                        value={formik.values.email}
+                        value={formik.values.username}
 
-                        error={formik.touched.email && Boolean(formik.errors.email)}
-                        helperText={formik.touched.email && formik.errors.email}
+                        error={formik.touched.username && Boolean(formik.errors.username)}
+                        helperText={formik.touched.username && formik.errors.username}
                     />
                     <TextField
                         variant="outlined"
@@ -82,6 +104,7 @@ const Signin = (props: LoginPropsInterface) => {
                         helperText={formik.touched.password && formik.errors.password}
 
                     />
+                    {showErrorMessage && <ErrorMessage message={"Invalid user credentials"}/>}
                     <Button
                         type="submit"
                         fullWidth
