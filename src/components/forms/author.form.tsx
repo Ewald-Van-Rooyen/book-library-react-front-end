@@ -1,4 +1,4 @@
-import React, {useContext} from "react";
+import React, {useContext, useState} from "react";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
@@ -11,20 +11,22 @@ import {AuthorFormPropsInterface} from "./form.interfaces";
 import axios from "axios";
 import {URLS} from "../../utils/constants";
 import {useMutation} from "react-query";
-import ValidationUtils from "../../utils/ValidationUtils";
+import ValidationUtils from "../../utils/validation.utils";
+import ErrorMessage from "../ui/error.message";
 
 const AuthorForm = (props: AuthorFormPropsInterface) => {
+    const {addAuthor, editAuthor, token, activeUser} = useContext(GlobalContext);
+    const [showErrorMessage, setShowErrorMessage] = useState(false);
     const classes = formStyles();
-    const {addAuthor, editAuthor, token} = useContext(GlobalContext);
 
     const mutation = useMutation(async (author: AuthorInterface | AuthorFormInterface) => {
         const id = (author as AuthorInterface).id || null;
 
         if (id) {
-            const {data} = await axios.put(`${URLS.AUTHOR}/${(author as AuthorInterface).id}`, author, ValidationUtils.generateAuthHeaders(token));
+            const {data} = await axios.put(`${URLS.AUTHOR}/${(author as AuthorInterface).id}`, author, ValidationUtils.generateAuthHeaders(token, activeUser));
             return data;
         } else {
-            const {data} = await axios.post(URLS.AUTHOR, author, ValidationUtils.generateAuthHeaders(token));
+            const {data} = await axios.post(URLS.AUTHOR, author, ValidationUtils.generateAuthHeaders(token, activeUser));
             return data;
         }
     }, {
@@ -38,6 +40,9 @@ const AuthorForm = (props: AuthorFormPropsInterface) => {
             }
 
             props.closeModalCallback();
+        },
+        onError:()=>{
+              setShowErrorMessage(true);
         }
     });
 
@@ -100,6 +105,7 @@ const AuthorForm = (props: AuthorFormPropsInterface) => {
                         />
                     </Grid>
                 </Grid>
+                 {showErrorMessage && <ErrorMessage message={"Add/Update action could not be completed"}/>}
                 <Button
                     type="submit"
                     fullWidth

@@ -1,5 +1,5 @@
 import React from "react";
-import {QueryClient, QueryClientProvider} from "react-query"
+import {QueryClient, QueryClientProvider} from "react-query";
 
 import AuthenticationContainer from "./containers/authentication.container";
 import {GlobalProvider} from "./context/global.state";

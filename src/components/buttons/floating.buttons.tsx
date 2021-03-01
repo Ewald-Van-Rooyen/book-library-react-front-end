@@ -16,14 +16,16 @@ import {
 import DynamicDialog from "../dialog/dynamic.dialog";
 import {useMutation} from "react-query";
 import axios from "axios";
-import ValidationUtils from "../../utils/ValidationUtils";
-
+import ValidationUtils from "../../utils/validation.utils";
+import {Tooltip} from "@material-ui/core";
+import ErrorMessage from "../ui/error.message";
 
 const FloatingButtons = () => {
 
-    const {selectedRow, activeModel, removeAuthor, removeCategory, removeBook, token} = useContext(GlobalContext);
+    const {selectedRow, activeModel, removeAuthor, removeCategory, removeBook, token, activeUser} = useContext(GlobalContext);
     const [isOpen, setIsOpen] = useState(false);
     const [dialogAction, setDialogAction] = useState(DialogTypeEnum.ADD);
+    const [showErrorMessage, setShowErrorMessage] = useState(false);
 
     const mutation = useMutation(async (id: string | number) => {
         let activeModelUrl = "";
@@ -43,11 +45,10 @@ const FloatingButtons = () => {
                 break;
         }
 
-        const {data} = await axios.delete(`${activeModelUrl}/${id}`, ValidationUtils.generateAuthHeaders(token));
+        const {data} = await axios.delete(`${activeModelUrl}/${id}`, ValidationUtils.generateAuthHeaders(token, activeUser));
         return data;
     }, {
         onSuccess: () => {
-            removeAuthor((selectedRow as AuthorInterface).id);
             switch (activeModel) {
                 case MODELS.AUTHOR:
                     removeAuthor((selectedRow as AuthorInterface).id);
@@ -61,6 +62,11 @@ const FloatingButtons = () => {
                 default:
                     break;
             }
+
+            setShowErrorMessage(false);
+        },
+        onError: (error) => {
+            setShowErrorMessage(true);
         }
     });
 
@@ -70,12 +76,12 @@ const FloatingButtons = () => {
 
     const openEditDialog = () => {
         setIsOpen(!!selectedRow);
-        setDialogAction(DialogTypeEnum.EDIT)
+        setDialogAction(DialogTypeEnum.EDIT);
     };
 
     const openAddDialog = () => {
         setIsOpen(true);
-        setDialogAction(DialogTypeEnum.ADD)
+        setDialogAction(DialogTypeEnum.ADD);
     };
 
     const deleteContent = (): void => {
@@ -105,22 +111,29 @@ const FloatingButtons = () => {
                   alignItems="center"
                   spacing={2}>
                 <Grid item>
-                    <Fab onClick={openAddDialog} color="primary" aria-label="add">
-                        <AddIcon/>
-                    </Fab>
+                    <Tooltip title="Add" aria-label="add">
+                        <Fab onClick={openAddDialog} color="primary" aria-label="add">
+                            <AddIcon/>
+                        </Fab>
+                    </Tooltip>
                 </Grid>
                 <Grid item>
-                    <Fab onClick={openEditDialog} color="primary" aria-label="edit">
-                        <EditIcon/>
-                    </Fab>
+                    <Tooltip title="Edit" aria-label="edit">
+                        <Fab onClick={openEditDialog} color="primary" aria-label="edit">
+                            <EditIcon/>
+                        </Fab>
+                    </Tooltip>
                 </Grid>
                 <Grid item>
-                    <Fab onClick={deleteContent} color="secondary" aria-label="edit">
-                        <DeleteIcon/>
-                    </Fab>
+                    <Tooltip title="Delete" aria-label="delete">
+                        <Fab onClick={deleteContent} color="secondary" aria-label="edit">
+                            <DeleteIcon/>
+                        </Fab>
+                    </Tooltip>
                 </Grid>
             </Grid>
             <DynamicDialog isOpen={isOpen} cancelCallback={closeCallback} actionType={dialogAction}/>
+            {showErrorMessage && <ErrorMessage message={"Delete action could not be completed"}/>}
         </>
     );
 };

@@ -1,4 +1,4 @@
-import React, {useContext} from "react";
+import React, {useContext, useState} from "react";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
@@ -6,7 +6,6 @@ import TextField from "@material-ui/core/TextField";
 import Link from "@material-ui/core/Link";
 import Grid from "@material-ui/core/Grid";
 
-import Typography from "@material-ui/core/Typography";
 import Container from "@material-ui/core/Container";
 
 import signUpStyles from "./signup.styles";
@@ -17,26 +16,27 @@ import {
     AuthenticationInterface,
     SignupInterface,
 } from "../../interfaces/models.interfaces";
-import axios from "axios";
-import {URLS} from "../../utils/constants";
 import {GlobalContext} from "../../context/global.state";
+import ValidationUtils from "../../utils/validation.utils";
+import {SignupPropsInterface} from "./signup.interfaces";
+import AppHeader from "../banners/app.header.banner";
+import PageHeader from "../banners/page.header.banner";
+import ErrorMessage from "../ui/error.message";
 
-interface SignupPropsInterface {
-    anchorClickCallback: () => void;
-    submitClickCallback: () => void;
-}
+const validationUtils: ValidationUtils = new ValidationUtils();
 
 const Signup = (props: SignupPropsInterface) => {
-    const {setToken} = useContext(GlobalContext);
+    const [showErrorMessage, setShowErrorMessage] = useState(false);
+    const {setToken, setActiveUser} = useContext(GlobalContext);
     const classes = signUpStyles();
 
-    const mutation = useMutation(async (user: SignupInterface) => {
-        const {data} = await axios.post(`${URLS.BASE_URL}signup`, user);
-        return data;
-    }, {
+    const mutation = useMutation(validationUtils.signUp, {
         onSuccess: (data: AuthenticationInterface) => {
             setToken(data.token);
             props.submitClickCallback();
+        },
+        onError: (error) => {
+            setShowErrorMessage(true);
         }
     });
 
@@ -49,6 +49,7 @@ const Signup = (props: SignupPropsInterface) => {
         },
         validationSchema: signupValidationSchema,
         onSubmit: (values: SignupInterface) => {
+            setActiveUser(values.username);
             mutation.mutate(values);
         },
     });
@@ -57,13 +58,8 @@ const Signup = (props: SignupPropsInterface) => {
         <Container component="main" maxWidth="xs">
             <CssBaseline/>
             <div className={classes.paper}>
-                {/*Move to own component*/}
-                <Typography component="h1" variant="h3">
-                    Book Library
-                </Typography>
-                <Typography component="h1" variant="h5">
-                    Sign up
-                </Typography>
+                <AppHeader/>
+                <PageHeader title="Sign up"/>
                 <form onSubmit={formik.handleSubmit} className={classes.form}>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
@@ -139,6 +135,8 @@ const Signup = (props: SignupPropsInterface) => {
                             />
                         </Grid>
                     </Grid>
+                    {showErrorMessage &&
+                    <ErrorMessage message={"Invalid user credentials | Server could not be reached"}/>}
                     <Button
                         type="submit"
                         fullWidth
@@ -151,7 +149,7 @@ const Signup = (props: SignupPropsInterface) => {
                     </Button>
                     <Grid container justify="flex-end">
                         <Grid item>
-                            <Link onClick={props.anchorClickCallback} variant="body2">
+                            <Link className={classes.anchor} onClick={props.anchorClickCallback} variant="body2">
                                 Already have an account? Sign in
                             </Link>
                         </Grid>

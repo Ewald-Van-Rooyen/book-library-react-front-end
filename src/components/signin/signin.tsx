@@ -7,7 +7,6 @@ import TextField from "@material-ui/core/TextField";
 import Link from "@material-ui/core/Link";
 import Grid from "@material-ui/core/Grid";
 
-import Typography from "@material-ui/core/Typography";
 import Container from "@material-ui/core/Container";
 
 import loginStyles from "./signin.styles";
@@ -16,33 +15,35 @@ import loginValidationSchema from "./signin.validation.schema";
 import {useFormik} from "formik";
 import {useMutation} from "react-query";
 import {AuthenticationInterface, SigninInterface} from "../../interfaces/models.interfaces";
-import axios from "axios";
-import {URLS} from "../../utils/constants";
+
 import {GlobalContext} from "../../context/global.state";
 import ErrorMessage from "../ui/error.message";
+import {SigninPropsInterface} from "./signin.interfaces";
+import ValidationUtils from "../../utils/validation.utils";
+import AppHeader from "../banners/app.header.banner";
+import PageHeader from "../banners/page.header.banner";
 
+const validationUtils: ValidationUtils = new ValidationUtils();
 
-interface LoginPropsInterface {
-    anchorClickCallback: () => void;
-    submitClickCallback: () => void;
-}
+/**
+ * Sign in screen to validate user login
+ * and navigate to the home screen or the Sign up screen
+ * @param props
+ * @constructor
+ */
+const Signin = (props: SigninPropsInterface) => {
+    const [showErrorMessage, setShowErrorMessage] = useState(false);
+    const {setToken, setActiveUser} = useContext(GlobalContext);
 
-const Signin = (props: LoginPropsInterface) => {
     const classes = loginStyles();
 
-    const [showErrorMessage, setShowErrorMessage] = useState(false);
-    const {setToken} = useContext(GlobalContext);
-
-    const mutation = useMutation(async (user: SigninInterface) => {
-        const {data} = await axios.post(`${URLS.BASE_URL}signin`, user);
-        return data;
-    }, {
+    const mutation = useMutation(validationUtils.signIn, {
         onSuccess: (data: AuthenticationInterface) => {
             setToken(data.token);
+
             props.submitClickCallback();
         },
         onError: (error) => {
-            console.log(error);
             setShowErrorMessage(true);
         }
     });
@@ -54,6 +55,7 @@ const Signin = (props: LoginPropsInterface) => {
         },
         validationSchema: loginValidationSchema,
         onSubmit: (values: SigninInterface) => {
+            setActiveUser(values.username);
             mutation.mutate(values);
         },
     });
@@ -62,12 +64,8 @@ const Signin = (props: LoginPropsInterface) => {
         <Container component="main" maxWidth="xs">
             <CssBaseline/>
             <div className={classes.paper}>
-                <Typography component="h1" variant="h3">
-                    Book Library
-                </Typography>
-                <Typography component="h1" variant="h5">
-                    Sign in
-                </Typography>
+                <AppHeader/>
+                <PageHeader title="Sign in"/>
                 <form className={classes.form} onSubmit={formik.handleSubmit}>
                     <TextField
                         variant="outlined"
@@ -104,7 +102,8 @@ const Signin = (props: LoginPropsInterface) => {
                         helperText={formik.touched.password && formik.errors.password}
 
                     />
-                    {showErrorMessage && <ErrorMessage message={"Invalid user credentials"}/>}
+                    {showErrorMessage &&
+                    <ErrorMessage message={"Invalid user credentials | Server could not be reached"}/>}
                     <Button
                         type="submit"
                         fullWidth
@@ -117,7 +116,7 @@ const Signin = (props: LoginPropsInterface) => {
                     </Button>
                     <Grid container>
                         <Grid item>
-                            <Link onClick={props.anchorClickCallback} variant="body2">
+                            <Link className={classes.anchor} onClick={props.anchorClickCallback} variant="body2">
                                 {"Don't have an account? Sign Up"}
                             </Link>
                         </Grid>

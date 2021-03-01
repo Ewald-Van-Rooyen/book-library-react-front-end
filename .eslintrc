@@ -1,0 +1,59 @@
+{
+  "extends": [
+    "react-app",
+    "plugin:react-hooks/recommended"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 2017
+  },
+  "env": {
+    "es6": true
+  },
+  "rules": {
+    "no-continue": "off",
+    "no-plusplus": "off",
+    "no-cond-assign": "off",
+    "camelcase": "off",
+    "no-param-reassign": "off",
+    "import/no-unresolved": "off",
+    "import/no-extraneous-dependencies": "off",
+    "import/extensions": 0,
+    "prefer-destructuring": "off",
+    "react/require-default-props": "off",
+    "react-hooks/exhaustive-deps": "off",
+    "react/jsx-filename-extension": [
+      1,
+      {
+        "extensions": [
+          ".tsx",
+          ".js",
+          ".jsx",
+          ".tsx"
+        ]
+      }
+    ],
+    "react/jsx-props-no-spreading": [
+      0
+    ],
+    "quotes": [
+      2,
+      "double",
+      {
+        "avoidEscape": true
+      }
+    ],
+    "react/destructuring-assignment": [
+      0,
+      "never",
+      {
+        "ignoreClassFields": true
+      }
+    ],
+    "no-underscore-dangle": [
+      0
+    ],
+    "semi": [
+      1
+    ]
+  }
+}

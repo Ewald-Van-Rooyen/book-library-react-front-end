@@ -4,7 +4,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     root: {
         flexGrow: 1,
         backgroundColor: theme.palette.background.paper,
-        '& > *': {
+        "& > *": {
             margin: theme.spacing(1),
         },
     }

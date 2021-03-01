@@ -40,7 +40,7 @@ const TabsController = () => {
                 <BookContainer/>
             </TabPanel>
         </>
-    )
+    );
 };
 
 export default TabsController;

@@ -1,46 +1,88 @@
-import React, {useContext} from "react";
+import React, {useContext, useState} from "react";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import formStyles from "./form.styles";
 import {useFormik} from "formik";
 import bookValidationSchema from "./books.validation.schema";
-import {BookFormInterface} from "../../interfaces/models.interfaces";
+import {
+    BookFormInterface,
+    BookInterface
+} from "../../interfaces/models.interfaces";
 import {GlobalContext} from "../../context/global.state";
 import {BookFormPropsInterface} from "./form.interfaces";
 import {FormControl, InputLabel, MenuItem, Select} from "@material-ui/core";
+import {useMutation} from "react-query";
+import axios from "axios";
+import {URLS} from "../../utils/constants";
+import ValidationUtils from "../../utils/validation.utils";
+import ErrorMessage from "../ui/error.message";
 
 const BooksForm = (props: BookFormPropsInterface) => {
-    const {categories, books, authors, addBook, editBook} = useContext(GlobalContext);
+    const {categories, authors, token, addBook, editBook, activeUser} = useContext(GlobalContext);
+    const [showErrorMessage, setShowErrorMessage] = useState(false);
     const classes = formStyles();
 
-    const categoryArray = categories.map((category) => {
-        return category.name
+    const mutation = useMutation(async (book: BookInterface | BookFormInterface) => {
+        const id = (book as BookInterface).id || null;
+
+        if (id) {
+            const {data} = await axios.put(`${URLS.BOOK}/${(book as BookInterface).id}`, book, ValidationUtils.generateAuthHeaders(token, activeUser));
+            return data;
+        } else {
+            const {data} = await axios.post(URLS.BOOK, book, ValidationUtils.generateAuthHeaders(token, activeUser));
+            return data;
+        }
+    }, {
+        onSuccess: (data: BookInterface) => {
+
+            const category = categories.filter((category) => {
+                return data.categoryId === category.id;
+            })[0];
+
+            data.category = category;
+
+            const author = authors.filter((author) => {
+                return data.authorId === author.id;
+            })[0];
+
+            data.author = author;
+
+            if (props.initialValues) {
+                editBook(data);
+            } else {
+                addBook(data);
+            }
+
+            props.closeModalCallback();
+        }, onError: () => {
+            setShowErrorMessage(true);
+        }
     });
 
-    const authorArray = authors.map((author) => {
-        return author.firstName + author.lastName;
-    });
 
     const formik = useFormik<BookFormInterface>({
         initialValues: {
             name: props.initialValues?.name || "",
-            yearPublished: props.initialValues?.yearPublished || "",
-            category: props.initialValues?.category || "",
-            author: props.initialValues?.author || "",
+            yearPublished: props.initialValues?.yearPublished || 0,
+            categoryId: props.initialValues?.categoryId || -1,
+            category: props.initialValues?.category || undefined,
+            authorId: props.initialValues?.authorId || -1,
+            author: props.initialValues?.author || undefined,
             isbnNumber: props.initialValues?.isbnNumber || "",
         },
         validationSchema: bookValidationSchema,
         onSubmit: (values: BookFormInterface) => {
-            const {name, yearPublished, category, author, isbnNumber} = values;
-            // TODO remove hack for work without ajax calls
+            const {name, yearPublished, categoryId, authorId, isbnNumber} = values;
+
+            const bookSaveObject = {name, yearPublished, categoryId, authorId, isbnNumber};
+
             if (props.initialValues) {
-                editBook({id: props.initialValues.id, name, yearPublished, category, author, isbnNumber});
-            } else {
-                addBook({id: (books.length + 1), name, yearPublished, category, author, isbnNumber});
+                // @ts-ignore
+                bookSaveObject.id = props.initialValues.id;
             }
 
-            props.closeModalCallback();
+            mutation.mutate(bookSaveObject);
         },
     });
 
@@ -106,18 +148,18 @@ const BooksForm = (props: BookFormPropsInterface) => {
                         <FormControl variant="outlined" className={classes.formControl}>
                             <InputLabel>Category *</InputLabel>
                             <Select
-                                id="category"
+                                id="categoryId"
                                 label="Category"
-                                name="category"
-                                value={formik.values.category}
+                                name="categoryId"
+                                value={formik.values.categoryId}
                                 onChange={formik.handleChange}
 
-                                error={formik.touched.category && Boolean(formik.errors.category)}
+                                error={formik.touched.categoryId && Boolean(formik.errors.categoryId)}
 
                             >
                                 <MenuItem value="">Select a category</MenuItem>
-                                {categoryArray.map((option) => {
-                                    return <MenuItem key={option} value={option}>{option}</MenuItem>
+                                {categories.map((option) => {
+                                    return <MenuItem key={option.id} value={option.id}>{option.name}</MenuItem>;
                                 })}
                             </Select>
                         </FormControl>
@@ -127,24 +169,25 @@ const BooksForm = (props: BookFormPropsInterface) => {
                         <FormControl variant="outlined" className={classes.formControl}>
                             <InputLabel>Author *</InputLabel>
                             <Select
-                                id="author"
+                                id="authorId"
                                 label="Author"
-                                name="author"
-                                value={formik.values.author}
+                                name="authorId"
+                                value={formik.values.authorId}
                                 onChange={formik.handleChange}
 
-                                error={formik.touched.author && Boolean(formik.errors.author)}
+                                error={formik.touched.authorId && Boolean(formik.errors.authorId)}
 
                             >
                                 <MenuItem value="">Select an author</MenuItem>
-                                {authorArray.map((option) => {
-                                    return <MenuItem key={option} value={option}>{option}</MenuItem>
+                                {authors.map((option) => {
+                                    return <MenuItem key={option.id}
+                                                     value={option.id}>{`${option.firstName}  ${option.lastName}`}</MenuItem>;
                                 })}
                             </Select>
                         </FormControl>
                     </Grid>
                 </Grid>
-
+                {showErrorMessage && <ErrorMessage message={"Add/Update action could not be completed"}/>}
                 <Button
                     type="submit"
                     fullWidth

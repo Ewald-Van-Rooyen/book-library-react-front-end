@@ -14,10 +14,12 @@ const BookContainer = () => {
         }
     };
 
+    const mappedBooks = books.map((book:BookInterface)=>({...book,author: (book.author?.firstName || ""+book.author?.lastName), category: book.category?.name}));
+
     return (<>
         <DynamicTable
             columns={BOOK_COLUMNS}
-            rows={books}
+            rows={mappedBooks}
             onRowSelectedCallback={onRowSelected}/>
     </>);
 };

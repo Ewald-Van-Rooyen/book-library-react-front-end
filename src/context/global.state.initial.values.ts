@@ -1,14 +1,14 @@
 import GlobalContextInterface from "./global.state.interface";
-import {BOOK_ROWS} from "../utils/setup/table.test.data";
 import {MODELS} from "../utils/constants";
 
 const contextDefaultValues: GlobalContextInterface = {
     categories: [],
     authors: [],
-    books: BOOK_ROWS,
+    books: [],
 
     selectedRow: null,
     token: "",
+    activeUser: "",
     activeModel: MODELS.AUTHOR,
 
     removeCategory: () => {
@@ -26,13 +26,16 @@ const contextDefaultValues: GlobalContextInterface = {
     addAuthor: () => {
     },
 
+    addBook: () => {
+    },
+
     addAuthorsBulk: () => {
     },
 
     addCategoriesBulk: () => {
     },
 
-    addBook: () => {
+    addBooksBulk: () => {
     },
 
     editCategory: () => {
@@ -52,6 +55,9 @@ const contextDefaultValues: GlobalContextInterface = {
 
     setToken: () => {
     },
+
+    setActiveUser: () => {
+    }
 
 };
 

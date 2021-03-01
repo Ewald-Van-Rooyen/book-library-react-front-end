@@ -1,9 +1,9 @@
-import React, {createContext, useReducer} from 'react';
+import React, {createContext, useReducer} from "react";
 import AppReducer from "./app.reducer";
 import {AuthorInterface, BookInterface, CategoryInterface} from "../interfaces/models.interfaces";
 import {MODELS} from "../utils/constants";
-import GlobalContextInterface from './global.state.interface';
-import contextDefaultValues from './global.state.initial.values';
+import GlobalContextInterface from "./global.state.interface";
+import contextDefaultValues from "./global.state.initial.values";
 
 export const GlobalContext = createContext<GlobalContextInterface>(contextDefaultValues);
 // @ts-ignore
@@ -33,7 +33,7 @@ export const GlobalProvider = ({children}) => {
 
     const addCategory = (category: CategoryInterface) => {
         dispatch({
-            type: 'ADD_CATEGORY',
+            type: "ADD_CATEGORY",
             payload: category
         });
     };
@@ -59,6 +59,13 @@ export const GlobalProvider = ({children}) => {
         });
     };
 
+    const addBooksBulk = (books: Array<BookInterface>) => {
+        dispatch({
+            type: "ADD_BOOKS_BULK",
+            payload: books
+        });
+    };
+
     const addBook = (book: BookInterface) => {
         dispatch({
             type: "ADD_BOOK",
@@ -68,14 +75,14 @@ export const GlobalProvider = ({children}) => {
 
     const setSelectedRow = (selectedRow: CategoryInterface | AuthorInterface | BookInterface | null) => {
         dispatch({
-            type: 'SET_SELECTED_ROW',
+            type: "SET_SELECTED_ROW",
             payload: selectedRow
         });
     };
 
     const setActiveModel = (activeModel: MODELS) => {
         dispatch({
-            type: 'SET_ACTIVE_MODEL',
+            type: "SET_ACTIVE_MODEL",
             payload: activeModel
         });
     };
@@ -84,6 +91,13 @@ export const GlobalProvider = ({children}) => {
         dispatch({
             type: "SET_TOKEN",
             payload: token
+        });
+    };
+
+    const setActiveUser = (username: string) => {
+        dispatch({
+            type: "SET_ACTIVE_USER",
+            payload: username
         });
     };
 
@@ -115,6 +129,7 @@ export const GlobalProvider = ({children}) => {
 
         selectedRow: state.selectedRow,
         activeModel: state.activeModel,
+        activeUser: state.activeUser,
         token: state.token,
 
         removeCategory,
@@ -122,10 +137,13 @@ export const GlobalProvider = ({children}) => {
         removeBook,
 
         addCategory,
-        addCategoriesBulk,
         addAuthor,
-        addAuthorsBulk,
+
         addBook,
+
+        addCategoriesBulk,
+        addAuthorsBulk,
+        addBooksBulk,
 
         editCategory,
         editAuthor,
@@ -133,7 +151,8 @@ export const GlobalProvider = ({children}) => {
 
         setSelectedRow,
         setActiveModel,
-        setToken
+        setToken,
+        setActiveUser
     }}>
         {children}
     </GlobalContext.Provider>);

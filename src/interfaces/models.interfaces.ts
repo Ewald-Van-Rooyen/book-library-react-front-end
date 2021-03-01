@@ -10,10 +10,13 @@ export interface CategoryFormInterface {
 
 export interface BookFormInterface {
     name: string;
-    yearPublished: string;
-    category: string;
-    author: string;
+    yearPublished: number;
+    categoryId: number;
+    authorId: number;
     isbnNumber: string;
+
+    author?: AuthorFormInterface;
+    category?: CategoryInterface;
 }
 
 export interface SignupInterface {

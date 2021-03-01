@@ -43,6 +43,11 @@ const AppReducer = (state: GlobalContextInterface, action: any) => {
                 ...state,
                 authors: [...state.authors, action.payload]
             };
+        case "ADD_BOOK":
+            return {
+                ...state,
+                books: [...state.books, action.payload]
+            };
         case "ADD_AUTHORS_BULK":
             return {
                 ...state,
@@ -53,10 +58,10 @@ const AppReducer = (state: GlobalContextInterface, action: any) => {
                 ...state,
                 categories: [...action.payload]
             };
-        case "ADD_BOOK":
+        case "ADD_BOOKS_BULK":
             return {
                 ...state,
-                books: [...state.books, action.payload]
+                books: [...action.payload]
             };
         case "EDIT_CATEGORY":
             const updatedCategory = action.payload;

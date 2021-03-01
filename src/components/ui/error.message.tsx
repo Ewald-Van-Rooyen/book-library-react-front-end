@@ -4,6 +4,7 @@ import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles(() => ({
     alert: {
+        marginTop:"10px",
         color: "red"
     }
 }));

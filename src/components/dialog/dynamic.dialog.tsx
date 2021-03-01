@@ -1,8 +1,8 @@
 import React, {useContext} from "react";
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import Button from '@material-ui/core/Button';
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import Button from "@material-ui/core/Button";
 import {GlobalContext} from "../../context/global.state";
 import {MODELS} from "../../utils/constants";
 import AuthorForm from "../forms/author.form";
@@ -17,7 +17,6 @@ interface DynamicDialogPropsInterface {
 }
 
 const generateModelForm = (activeModel: MODELS, closeModalCallback: () => void, selectedRow: null | AuthorInterface | CategoryInterface | BookInterface, actionType: DialogTypeEnum): React.ReactNode => {
-
     switch (activeModel) {
         case MODELS.AUTHOR:
             return <AuthorForm
@@ -35,6 +34,11 @@ const generateModelForm = (activeModel: MODELS, closeModalCallback: () => void, 
     }
 };
 
+/**
+ * Creates the model add or edit popup
+ * @param props
+ * @constructor
+ */
 const DynamicDialog = (props: DynamicDialogPropsInterface) => {
     const {activeModel, selectedRow} = useContext(GlobalContext);
 

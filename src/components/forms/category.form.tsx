@@ -1,4 +1,4 @@
-import React, {useContext} from "react";
+import React, {useContext, useState} from "react";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
@@ -15,20 +15,22 @@ import {CategoryFormPropsInterface} from "./form.interfaces";
 import {useMutation} from "react-query";
 import axios from "axios";
 import {URLS} from "../../utils/constants";
-import ValidationUtils from "../../utils/ValidationUtils";
+import ValidationUtils from "../../utils/validation.utils";
+import ErrorMessage from "../ui/error.message";
 
 const CategoryForm = (props: CategoryFormPropsInterface) => {
-    const {addCategory, editCategory, token} = useContext(GlobalContext);
+    const {addCategory, editCategory, token, activeUser} = useContext(GlobalContext);
+    const [showErrorMessage, setShowErrorMessage] = useState(false);
     const classes = formStyles();
 
     const mutation = useMutation(async (category: CategoryInterface | CategoryFormInterface) => {
         const id = (category as CategoryInterface).id || null;
 
         if (id) {
-            const {data} = await axios.put(`${URLS.CATEGORY}/${(category as CategoryInterface).id}`, category, ValidationUtils.generateAuthHeaders(token));
+            const {data} = await axios.put(`${URLS.CATEGORY}/${(category as CategoryInterface).id}`, category, ValidationUtils.generateAuthHeaders(token, activeUser));
             return data;
         } else {
-            const {data} = await axios.post(URLS.CATEGORY, category, ValidationUtils.generateAuthHeaders(token));
+            const {data} = await axios.post(URLS.CATEGORY, category, ValidationUtils.generateAuthHeaders(token, activeUser));
             return data;
         }
     }, {
@@ -37,12 +39,14 @@ const CategoryForm = (props: CategoryFormPropsInterface) => {
 
             if (props.initialValues) {
                 editCategory(createdCategory);
-                
+
             } else {
                 addCategory(createdCategory);
             }
 
             props.closeModalCallback();
+        }, onError: () => {
+            setShowErrorMessage(true);
         }
     });
 
@@ -105,6 +109,7 @@ const CategoryForm = (props: CategoryFormPropsInterface) => {
                         />
                     </Grid>
                 </Grid>
+                {showErrorMessage && <ErrorMessage message={"Add/Update action could not be completed"}/>}
                 <Button
                     type="submit"
                     fullWidth

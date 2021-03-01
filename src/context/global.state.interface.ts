@@ -9,6 +9,7 @@ export default interface GlobalContextInterface {
     selectedRow: CategoryInterface | AuthorInterface | BookInterface | null;
     activeModel: MODELS;
     token: string;
+    activeUser: string;
 
     removeCategory(id: string | number): void;
 
@@ -20,11 +21,13 @@ export default interface GlobalContextInterface {
 
     addAuthor(author: AuthorInterface): void;
 
+    addBook(book: BookInterface): void;
+
     addAuthorsBulk(authors: Array<AuthorInterface>): void;
 
-    addCategoriesBulk(categories: Array<CategoryInterface>): void;
+    addBooksBulk(books: Array<BookInterface>): void;
 
-    addBook(book: BookInterface): void;
+    addCategoriesBulk(categories: Array<CategoryInterface>): void;
 
     editCategory(category: CategoryInterface): void;
 
@@ -37,4 +40,7 @@ export default interface GlobalContextInterface {
     setActiveModel(activeModel: MODELS): void;
 
     setToken(token: string): void;
-}
+
+    setActiveUser(username: string): void;
+
+};

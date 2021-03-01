@@ -2,6 +2,7 @@
 
 This is the front end section of the Book Library built using React.
 A complete list of technologies can be found at the end of this README.
+See documentation for application specific functionality enquiries
 
 ## Available Scripts
 
@@ -15,7 +16,6 @@ This command will install all the application specific required modules
 
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
 
 ## Technologies
 

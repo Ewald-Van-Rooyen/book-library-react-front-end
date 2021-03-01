@@ -1,4 +1,4 @@
-export interface SigninPropsInterface {
+export interface SignupPropsInterface {
     anchorClickCallback: () => void;
     submitClickCallback: () => void;
 }
